@@ -502,6 +502,10 @@ a[href="./"]:hover{transform:translateY(-2px) scale(1.06) !important;background:
 </style>
 <!-- end-setup_player-localfont-player -->
 <style>
+/* setup_player: font-family (player) */
+.splash-hunters, .title-ivys, .player-name, .player-title, .splash-player, #player-name, .player-label { font-family: Midorima, sans-serif !important; }
+</style>
+<style>
 /* setup_player: font-size (player) */
 .splash-hunters, .title-ivys, .player-name, .player-title, .splash-player, #player-name, .player-label { font-size: clamp(2.5rem,10vw,5rem) !important; }
 </style>
@@ -509,8 +513,8 @@ a[href="./"]:hover{transform:translateY(-2px) scale(1.06) !important;background:
 <style>
 /* setup_player: color/effect (player) */
 .splash-hunters, .title-ivys, .player-name, .player-title, .splash-player, #player-name, .player-label {
-  color: #FF0080 !important;
-  -webkit-text-fill-color: #FF0080 !important;
+  color: #FF8C00 !important;
+  -webkit-text-fill-color: #FF8C00 !important;
   background: none !important;
   -webkit-background-clip: unset !important;
   background-clip: unset !important;
@@ -531,15 +535,19 @@ a[href="./"]:hover{transform:translateY(-2px) scale(1.06) !important;background:
 </style>
 <!-- end-setup_player-localfont-game -->
 <style>
+/* setup_player: font-family (game) */
+.splash-word-slayer, .splash-title, .game-title, .title-hop, .title-game, .splash-screen .title, .start-screen .title, #splash-title, #game-title { font-family: Sakuna, sans-serif !important; }
+</style>
+<style>
 /* setup_player: font-size (game) */
-.splash-word-slayer, .splash-title, .game-title, .title-hop, .title-game, .splash-screen .title, .start-screen .title, #splash-title, #game-title { font-size: 5rem !important; }
+.splash-word-slayer, .splash-title, .game-title, .title-hop, .title-game, .splash-screen .title, .start-screen .title, #splash-title, #game-title { font-size: clamp(3rem,14vw,7rem) !important; }
 </style>
 <!-- setup_player-style-game -->
 <style>
 /* setup_player: color/effect (game) */
 .splash-word-slayer, .splash-title, .game-title, .title-hop, .title-game, .splash-screen .title, .start-screen .title, #splash-title, #game-title {
-  color: #00FFFF !important;
-  -webkit-text-fill-color: #00FFFF !important;
+  color: #00EEFF !important;
+  -webkit-text-fill-color: #00EEFF !important;
   background: none !important;
   -webkit-background-clip: unset !important;
   background-clip: unset !important;
@@ -584,7 +592,7 @@ function Game() {
   const [toast,     setToast]     = useState(null);
   const inputRef = useRef(null);
 
-  const JSONBIN_ID = "69fca31aadc21f119a68cfdb";
+  const JSONBIN_ID = "69f4bb15856a682189951df2";
   const JSONBIN_KEY = "$2a$10$ZmohFEKQaFz/Ag31Eov7I.pYkzvW4GDsS1lXI0HcUG/Qv6sqOBVA.";
   const saveTimerRef = useRef(null);
   const isSaving = useRef(false);
@@ -721,7 +729,7 @@ function Game() {
 
 
 
-  const grade6Pool = ["able", "add", "after", "again", "age", "ago", "ahead", "air", "all", "allow", "also", "always", "animal", "answer", "any", "apple", "ask", "away", "baby", "back", "ball", "band", "bear", "because", "been", "before", "begin", "being", "below", "best", "bird", "birthday", "black", "blue", "boat", "body", "book", "born", "both", "bought", "box", "boy", "bring", "brother", "build", "busy", "buy", "cake", "call", "came", "can", "care", "carry", "cat", "chair", "change", "check", "child", "city", "class", "clean", "clear", "close", "cloud", "cold", "color", "come", "cook", "cool", "copy", "cost", "could", "count", "cover", "cry", "cup", "cut", "dark", "day", "dear", "deep", "did", "different", "dinner", "does", "done", "door", "down", "draw", "dream", "drink", "drive", "drop", "dry", "duck", "during", "each", "earn", "easy", "eight", "else", "end", "enjoy", "enough", "even", "every", "except", "exit", "face", "fall", "family", "far", "farm", "fast", "feel", "feet", "fill", "find", "fine", "fish", "five", "fix", "flew", "flip", "fly", "fond", "food", "forest", "forget", "found", "four", "fox", "free", "friend", "from", "front", "full", "fun", "funny", "gave", "gift", "girl", "give", "glad", "glam", "going", "gone", "good", "got", "grab", "great", "green", "grew", "grow", "guess", "had", "half", "hand", "happy", "hard", "has", "have", "head", "hear", "help", "here", "hide", "high", "hill", "hint", "hold", "home", "hope", "house", "how", "huge", "hump", "hunt", "idea", "into", "jab", "jack", "jar", "jot", "jump", "just", "keep", "kind", "king", "know", "lab", "lake", "land", "large", "last", "late", "lead", "leaf", "learn", "left", "let", "light", "like", "list", "little", "live", "long", "look", "love", "low", "made", "main", "make", "many", "map", "may", "mean", "meet", "mix", "mom", "more", "most", "move", "much", "must", "name", "need", "nest", "new", "next", "nice", "night", "nine", "now", "often", "old", "once", "open", "other", "our", "out", "own", "page", "park", "part", "past", "pick", "place", "plan", "play", "point", "pond", "pool", "print", "pull", "push", "put", "quiz", "race", "rain", "raise", "ran", "read", "real", "red", "rest", "rice", "rich", "ride", "right", "road", "rock", "room", "rope", "rose", "round", "rule", "run", "said", "same", "sand", "save", "saw", "say", "school", "seed", "seen", "send", "set", "seven", "show", "side", "since", "sing", "size", "skip", "sleep", "slow", "small", "smell", "smile", "snow", "soft", "some", "song", "soon", "speak", "spot", "star", "stay", "step", "still", "stop", "storm", "story", "straw", "strong", "such", "summer", "sun", "sure", "swim", "take", "talk", "than", "that", "them", "then", "there", "they", "thin", "thing", "think", "those", "time", "tiny", "told", "too", "took", "top", "try", "turn", "two", "under", "until", "upon", "use", "very", "vine", "wait", "walk", "want", "warm", "was", "wash", "watch", "water", "way", "were", "west", "when", "which", "while", "white", "who", "why", "will", "wind", "wish", "with", "word", "work", "world", "would", "write", "yard", "year", "yes", "yet", "you", "your", "zebra", "zone"];
+  const grade6Pool = ["accommodate", "acknowledge", "aggressive", "ambiguous", "approximately", "benevolent", "circumstances", "coincidence", "contemporary", "controversy", "correspond", "dilemma", "eloquent", "equivalent", "exaggerate", "extraordinary", "humiliating", "hypocrite", "inevitable", "ingenious", "legitimate", "lieutenant", "maintenance", "millennium", "mischievous", "misspell", "mountainous", "necessary", "negotiate", "neighborhood", "nuisance", "obstacle", "occurrence", "offensive", "omission", "opportunity", "optimistic", "outrageous", "particular", "passionate", "perceive", "performance", "persistence", "perspective", "phenomenon", "playwright", "plausible", "politician", "possession", "precede", "prejudice", "predominant", "presumptuous", "privilege", "proceeding", "proficient", "proportion", "prosecutor", "psychiatry", "psychology", "publicity", "punctuation", "qualification", "questionnaire", "reasonable", "recession", "recommend", "rehabilitation", "rehearsal", "relevance", "representative", "reputation", "resistance", "responsibility", "satirical", "scarcely", "scholarly", "skeptical", "sophomore", "statistics", "subordinate", "substantial", "sufficient", "summarize", "supernatural", "suppression", "suspicious", "technically", "temporary", "tendency", "tolerance", "tournament", "transparent", "tremendous", "uncertain", "unforgettable", "universal", "unnecessary", "unpredictable", "vocabulary", "volunteer", "vulnerable", "wilderness", "withdrawal", "worthwhile", "abundance", "accessible", "accomplishment", "accountable", "accumulate", "accurately", "achievement", "acquisition", "additionally", "adequately", "administration", "admirable", "advancement", "affectionate", "affordable", "allegiance", "altogether", "ambition", "amendment", "amplify", "analysis", "antagonist", "anticipate", "apologetic", "applicable", "appreciation", "appropriate", "argumentative", "arrangement", "articulate", "assassination", "assessment", "assignment", "assistance", "assumption", "atmosphere", "attentive", "attribute", "authoritative", "awareness", "behavioral", "beneficial", "biological", "capability", "captivating", "categorical", "causation", "celebratory", "characteristic", "charitable", "chronicle", "circumstantial", "civilization", "collaborate", "commentary", "commission", "commitment", "communicate", "comparative", "compassionate", "competition", "complement", "comprehension", "concentration", "confrontation", "congregation", "consciousness", "contamination", "contradiction", "controversial", "coordination", "corroboration", "cultivation", "declaration", "demonstration", "determination", "differentiation", "discrimination", "documentation", "elaboration", "elimination", "empowerment", "encouragement", "enlightenment", "environmental", "exoneration", "explanation", "exploitation", "facilitation", "falsification", "globalization", "humanization", "identification", "imagination", "implementation"];
 
   function randomFill() {
     const pool = [...grade6Pool];
@@ -1200,7 +1208,7 @@ function Game() {
               <div className="modal-body">
                 <p style={{marginBottom:16}}>
                   <strong style={{color:"#FFD700",fontSize:"1.05rem"}}>IVY'S — HOP 'N SPELL</strong><br/>
-                  <span style={{color:"rgba(255,255,255,.6)",fontSize:".85rem"}}>Andrew Blyskosz &nbsp;·&nbsp; © 2026 &nbsp;·&nbsp; Version 10 &nbsp;·&nbsp; Bin: 69fca31aadc21f119a68cfdb</span>
+                  <span style={{color:"rgba(255,255,255,.6)",fontSize:".85rem"}}>Andrew Blyskosz &nbsp;·&nbsp; © 2026 &nbsp;·&nbsp; Version 10 &nbsp;·&nbsp; Bin: 69f4bb15856a682189951df2</span>
                 </p>
                 <p style={{marginBottom:8,color:"rgba(255,255,255,.5)",fontSize:".8rem",letterSpacing:"1px",textTransform:"uppercase",fontWeight:800}}>Support the developer</p>
                 <div style={{display:"flex",flexDirection:"column",gap:"8px"}}>
