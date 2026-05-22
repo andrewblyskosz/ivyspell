@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Ivy Spell</title>
+<title>marcus tab</title>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Spell Master"/>
@@ -99,7 +99,7 @@ body::before{
 .stats-row{display:flex;align-items:center;gap:16px;margin-bottom:14px;position:relative;z-index:1;}
 .progress-bg{flex:1;background:rgba(255,255,255,.08);border-radius:100px;height:6px;overflow:hidden;}
 .progress-fill{height:100%;background:linear-gradient(90deg,#FF2D78,#FFD700);border-radius:100px;transition:width .5s ease;box-shadow:0 0 10px rgba(255,45,120,.6);}
-.word-counter{font-family:'Bangers',cursive;font-size:1.1rem;letter-spacing:3px;color:#FFD700;filter:drop-shadow(0 0 8px rgba(255,215,0,.4));white-space:nowrap;}
+.word-counter{font-family:'Bangers', sans-serif;font-size:1.1rem;letter-spacing:3px;color:#FFD700;filter:drop-shadow(0 0 8px rgba(255,215,0,.4));white-space:nowrap;}
 .tries-row{display:flex;align-items:center;gap:6px;white-space:nowrap;}
 .try-dot{width:10px;height:10px;border-radius:50%;border:2px solid;}
 .try-dot.on{background:#FFD700;border-color:#FFD700;box-shadow:0 0 8px #FFD700;}
@@ -107,7 +107,7 @@ body::before{
 .try-label{font-size:.65rem;font-weight:800;letter-spacing:1.5px;color:rgba(255,255,255,.35);text-transform:uppercase;margin-left:3px;}
 
 /* ── BUTTONS ── */
-.btn{font-family:'Bangers',cursive;letter-spacing:2px;border:none;border-radius:10px;cursor:pointer;transition:transform .12s,box-shadow .15s;}
+.btn{font-family:'Bangers', sans-serif;letter-spacing:2px;border:none;border-radius:10px;cursor:pointer;transition:transform .12s,box-shadow .15s;}
 .btn:active{transform:scale(.95)!important;}
 .btn-start{background:linear-gradient(135deg,#FF2D78,#FF6B00);color:#fff;font-size:1rem;padding:8px 20px;width:100%;box-shadow:0 4px 28px rgba(255,45,120,.5);position:relative;z-index:1;}
 .btn-start:hover{transform:translateY(-2px);box-shadow:0 6px 36px rgba(255,45,120,.7);}
@@ -153,7 +153,7 @@ body::before{
 .ov-try{background:rgba(22,10,0,.96);border:2.5px solid #FF8C00;}
 .ov-wrong{background:rgba(20,0,0,.88);border:1.5px solid rgba(160,40,40,.5);animation:ov-in .3s ease-out;}
 
-.ov-big{font-family:'Bangers',cursive;letter-spacing:5px;text-align:center;line-height:1;}
+.ov-big{font-family:'Bangers', sans-serif;letter-spacing:5px;text-align:center;line-height:1;}
 .ov-correct .ov-big{font-size:4rem;background:linear-gradient(135deg,#FF2D78,#FF6B00,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 28px rgba(0,255,136,.5));animation:pop .4s cubic-bezier(.34,1.56,.64,1);}
 .ov-try .ov-big{font-size:3rem;color:#FF8C00;filter:drop-shadow(0 0 18px rgba(255,140,0,.5));}
 .ov-wrong .ov-big{font-size:2.2rem;color:#CC4444;filter:drop-shadow(0 0 8px rgba(160,40,40,.3));}
@@ -170,10 +170,10 @@ body::before{
   box-shadow:0 0 40px rgba(0,255,136,.28);
 }
 .score-ring::after{content:'';position:absolute;inset:12px;border-radius:50%;background:rgba(8,8,30,.95);}
-.score-num{font-family:'Bangers',cursive;font-size:2rem;letter-spacing:2px;color:#FFD700;z-index:1;filter:drop-shadow(0 0 10px rgba(255,215,0,.4));}
+.score-num{font-family:'Bangers', sans-serif;font-size:2rem;letter-spacing:2px;color:#FFD700;z-index:1;filter:drop-shadow(0 0 10px rgba(255,215,0,.4));}
 .verdict-block{display:flex;flex-direction:column;gap:6px;}
 .stars-row{font-size:1.6rem;}
-.verdict{font-family:'Bangers',cursive;font-size:1.3rem;letter-spacing:2px;}
+.verdict{font-family:'Bangers', sans-serif;font-size:1.3rem;letter-spacing:2px;}
 .result-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;max-height:160px;overflow-y:auto;position:relative;z-index:1;margin-bottom:4px;}
 .result-grid::-webkit-scrollbar{width:4px;}
 .result-grid::-webkit-scrollbar-thumb{background:rgba(255,45,120,.4);border-radius:100px;}
@@ -263,7 +263,7 @@ body::before{
   animation:ov-in .25s cubic-bezier(.34,1.56,.64,1);
 }
 .modal-title{flex-shrink:0;
-  font-family:'Bangers',cursive;font-size:2rem;letter-spacing:3px;
+  font-family:'Bangers', sans-serif;font-size:2rem;letter-spacing:3px;
   color:#FFD700;margin-bottom:18px;filter:drop-shadow(0 0 8px rgba(255,215,0,.3));
 }
 .modal-body{font-size:.95rem;font-weight:600;color:rgba(255,255,255,.8);line-height:1.7;}
@@ -502,6 +502,10 @@ a[href="./"]:hover{transform:translateY(-2px) scale(1.06) !important;background:
 </style>
 <!-- end-setup_player-localfont-player -->
 <style>
+/* setup_player: font-family (player) */
+.splash-hunters, .title-ivys, .player-name, .player-title, .splash-player, #player-name, .player-label { font-family: Midorima, sans-serif !important; }
+</style>
+<style>
 /* setup_player: font-size (player) */
 .splash-hunters, .title-ivys, .player-name, .player-title, .splash-player, #player-name, .player-label { font-size: clamp(2.5rem,10vw,5rem) !important; }
 </style>
@@ -530,6 +534,10 @@ a[href="./"]:hover{transform:translateY(-2px) scale(1.06) !important;background:
 .splash-word-slayer, .splash-title, .game-title, .title-hop, .title-game, .splash-screen .title, .start-screen .title, #splash-title, #game-title { font-family: 'Bobogie Groovy', sans-serif !important; }
 </style>
 <!-- end-setup_player-localfont-game -->
+<style>
+/* setup_player: font-family (game) */
+.splash-word-slayer, .splash-title, .game-title, .title-hop, .title-game, .splash-screen .title, .start-screen .title, #splash-title, #game-title { font-family: Sakuna, sans-serif !important; }
+</style>
 <style>
 /* setup_player: font-size (game) */
 .splash-word-slayer, .splash-title, .game-title, .title-hop, .title-game, .splash-screen .title, .start-screen .title, #splash-title, #game-title { font-size: clamp(3rem,14vw,7rem) !important; }
