@@ -3,11 +3,13 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>IVY SPELL</title>
+<title>Ivy Spell</title>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Spell Master"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;700;900&family=Fredoka+One&display=swap" rel="stylesheet"/>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;}
@@ -109,7 +111,7 @@ body::before{
 /* ── BUTTONS ── */
 .btn{font-family:'Bangers',sans-serif;letter-spacing:2px;border:none;border-radius:10px;cursor:pointer;transition:transform .12s,box-shadow .15s;}
 .btn:active{transform:scale(.95)!important;}
-.btn-start{background:linear-gradient(135deg,#FF2D78,#FF6B00);color:#fff;font-size:1rem;padding:8px 20px;width:100%;box-shadow:0 4px 28px rgba(255,45,120,.5);position:relative;z-index:1;}
+.btn-start{font-family:'Fredoka One','Bangers',sans-serif;letter-spacing:3px;background:linear-gradient(135deg,#FF2D78,#FF6B00);color:#fff;font-size:1.15rem;padding:10px 20px;width:100%;box-shadow:0 4px 28px rgba(255,45,120,.5);position:relative;z-index:1;text-shadow:0 2px 6px rgba(0,0,0,.25);}
 .btn-start:hover{transform:translateY(-2px);box-shadow:0 6px 36px rgba(255,45,120,.7);}
 .btn-speak{background:linear-gradient(135deg,#7B2FFF,#00C4DD);color:#fff;font-size:1rem;padding:12px 28px;box-shadow:0 4px 20px rgba(123,47,255,.4);width:auto;display:inline-flex;align-items:center;gap:8px;}
 .btn-speak:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(0,245,255,.5);}
@@ -420,10 +422,6 @@ body::before{
 a[href="./"]:hover{transform:translateY(-2px) scale(1.06) !important;background:linear-gradient(135deg,rgba(255,45,120,0.5),rgba(191,95,255,0.5)) !important;box-shadow:0 6px 24px rgba(255,45,120,0.45) !important;border-color:rgba(255,45,120,0.8) !important;}
 </style>
 <style>
-@font-face { font-family: 'Budmo'; src: url('FONT_PLACEHOLDER') format('truetype'); font-weight: normal; }
-@font-face { font-family: 'BradleyHand'; src: url('FONT_PLACEHOLDER') format('truetype'); font-weight: normal; }
-</style>
-<style>
 /* ── SPLASH ── */
 #splash{
   position:fixed;inset:0;z-index:9999;
@@ -509,8 +507,8 @@ a[href="./"]:hover{transform:translateY(-2px) scale(1.06) !important;background:
 <style>
 /* setup_player: color/effect (player) */
 .splash-hunters, .title-ivys, .player-name, .player-title, .splash-player, #player-name, .player-label {
-  color: #FF8C00 !important;
-  -webkit-text-fill-color: #FF8C00 !important;
+  color: #FF0080 !important;
+  -webkit-text-fill-color: #FF0080 !important;
   background: none !important;
   -webkit-background-clip: unset !important;
   background-clip: unset !important;
@@ -764,24 +762,66 @@ function Game() {
     setTimeout(()=>setToast(null), 2800);
   };
 
+  // Cached best voice - found once and reused.
+  const voiceRef = useRef(null);
+
+  // Tiered voice priority. Tries known high-quality voices first,
+  // falls back gracefully on devices that don't have them.
+  const pickBestVoice = useCallback(() => {
+    const voices = window.speechSynthesis.getVoices();
+    if (!voices.length) return null;
+
+    // Tier 1: Apple "Enhanced/Premium" voices (iOS 17+, macOS Sonoma+).
+    // These sound dramatically more natural than the standard set.
+    let v = voices.find(x => /enhanced|premium|neural/i.test(x.name) &&
+      /samantha|ava|allison|susan|karen|moira|fiona|tessa|nicky|victoria|evan|noelle/i.test(x.name) &&
+      x.lang.startsWith('en'));
+    if (v) return v;
+
+    // Tier 2: Google Network/Natural voices (modern Android Chrome).
+    v = voices.find(x => /^google.*english/i.test(x.name) && /female|f$/i.test(x.name));
+    if (v) return v;
+    v = voices.find(x => /^google (us|uk) english/i.test(x.name));
+    if (v) return v;
+
+    // Tier 3: Standard Apple voices known to be clear and pleasant.
+    v = voices.find(x => /^(samantha|ava|allison|susan|karen|moira|fiona|nicky)\b/i.test(x.name) &&
+      x.lang.startsWith('en'));
+    if (v) return v;
+
+    // Tier 4: Microsoft Windows female voices.
+    v = voices.find(x => /microsoft (zira|hazel|eva|aria|jenny)/i.test(x.name));
+    if (v) return v;
+
+    // Tier 5: Anything explicitly labelled female + English.
+    v = voices.find(x => /female|woman|girl/i.test(x.name) && x.lang.startsWith('en'));
+    if (v) return v;
+
+    // Tier 6: Any English voice.
+    return voices.find(x => x.lang.startsWith('en')) || voices[0];
+  }, []);
+
   const speak = useCallback((word) => {
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(word);
-    u.rate=0.8; u.pitch=1.1;
+    // Slower rate + neutral pitch reads clearer for kids learning to spell.
+    u.rate = 0.75;
+    u.pitch = 1.05;
+    u.volume = 1.0;
 
-    // Pick a female voice — try common female names first, fall back gracefully
-    const voices = window.speechSynthesis.getVoices();
-    const femaleVoice = voices.find(v =>
-      /female|woman|girl|zira|susan|samantha|victoria|karen|moira|fiona|tessa|veena|allison|ava|nicky/i.test(v.name)
-    ) || voices.find(v =>
-      v.name.toLowerCase().includes('en') && v.lang.startsWith('en') && v.name.match(/\bf\b|[^a-z]f[^a-z]/i)
-    ) || voices.find(v => v.lang.startsWith('en'));
+    // Use cached voice; re-pick if voices weren't ready at mount time.
+    const voice = voiceRef.current || pickBestVoice();
+    if (voice) {
+      voiceRef.current = voice;
+      u.voice = voice;
+      u.lang = voice.lang;
+    }
 
-    if(femaleVoice) u.voice = femaleVoice;
-    u.onstart=()=>setSpeaking(true);
-    u.onend=()=>setSpeaking(false);
+    u.onstart = () => setSpeaking(true);
+    u.onend   = () => setSpeaking(false);
+    u.onerror = () => setSpeaking(false);
     window.speechSynthesis.speak(u);
-  },[]);
+  }, [pickBestVoice]);
 
   const doFlash = c => { setFlash(c); setTimeout(()=>setFlash(null),350); };
 
@@ -882,10 +922,16 @@ function Game() {
   const pct   = Math.round((score/total)*100);
 
   useEffect(()=>{
-    // Pre-load voices so they're ready on first button press
-    window.speechSynthesis.getVoices();
-    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-  },[]);
+    // Voices on iOS/Android may load asynchronously. Cache the best one
+    // as soon as it's available so the first button press is instant.
+    const loadVoice = () => {
+      const v = pickBestVoice();
+      if (v) voiceRef.current = v;
+    };
+    loadVoice();
+    window.speechSynthesis.onvoiceschanged = loadVoice;
+    return () => { window.speechSynthesis.onvoiceschanged = null; };
+  },[pickBestVoice]);
 
   return (
     <div id="app-inner" style={{position:"relative",zIndex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"flex-start",minHeight:"100vh",padding:"12px 20px 18px"}}>
@@ -1200,7 +1246,7 @@ function Game() {
               <div className="modal-body">
                 <p style={{marginBottom:16}}>
                   <strong style={{color:"#FFD700",fontSize:"1.05rem"}}>IVY'S — HOP 'N SPELL</strong><br/>
-                  <span style={{color:"rgba(255,255,255,.6)",fontSize:".85rem"}}>Andrew Blyskosz &nbsp;·&nbsp; © 2026 &nbsp;·&nbsp; Version 10 &nbsp;·&nbsp; Bin: 69f4bb15856a682189951df2</span>
+                  <span style={{color:"rgba(255,255,255,.6)",fontSize:".85rem"}}>Andrew Blyskosz &nbsp;·&nbsp; © 2026 &nbsp;·&nbsp; Version 10 &nbsp;·&nbsp; Bin: {JSONBIN_ID}</span>
                 </p>
                 <p style={{marginBottom:8,color:"rgba(255,255,255,.5)",fontSize:".8rem",letterSpacing:"1px",textTransform:"uppercase",fontWeight:800}}>Support the developer</p>
                 <div style={{display:"flex",flexDirection:"column",gap:"8px"}}>
