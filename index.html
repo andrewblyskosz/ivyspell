@@ -504,20 +504,20 @@ a[href="./"]:hover{transform:translateY(-2px) scale(1.06) !important;background:
 <!-- end-setup_player-localfont-player -->
 <style>
 /* setup_player: font-size (player) */
-.splash-hunters, .title-ivys, .player-name, .player-title, .splash-player, #player-name, .player-label { font-size: 4rem !important; }
+.splash-hunters, .title-ivys, .player-name, .player-title, .splash-player, #player-name, .player-label { font-size: clamp(2.5rem,10vw,5rem) !important; }
 </style>
 <!-- setup_player-style-player -->
 <style>
 /* setup_player: color/effect (player) */
 .splash-hunters, .title-ivys, .player-name, .player-title, .splash-player, #player-name, .player-label {
-  color: #FF00FF !important;
-  -webkit-text-fill-color: #FF00FF !important;
+  color: #00FFFF !important;
+  -webkit-text-fill-color: #00FFFF !important;
   background: none !important;
   -webkit-background-clip: unset !important;
   background-clip: unset !important;
   -webkit-text-stroke: 0 !important;
   font-weight: normal !important;
-  -webkit-text-stroke: 3px #800080 !important;
+  -webkit-text-stroke: 3px #007575 !important;
   text-shadow: none !important;
 }
 </style>
@@ -539,14 +539,14 @@ a[href="./"]:hover{transform:translateY(-2px) scale(1.06) !important;background:
 <style>
 /* setup_player: color/effect (game) */
 .splash-word-slayer, .splash-title, .game-title, .title-hop, .title-game, .splash-screen .title, .start-screen .title, #splash-title, #game-title {
-  color: #00FFFF !important;
-  -webkit-text-fill-color: #00FFFF !important;
+  color: #FF00FF !important;
+  -webkit-text-fill-color: #FF00FF !important;
   background: none !important;
   -webkit-background-clip: unset !important;
   background-clip: unset !important;
   -webkit-text-stroke: 0 !important;
   font-weight: normal !important;
-  -webkit-text-stroke: 3PX #007171 !important;
+  -webkit-text-stroke: 3PX #6A006A !important;
   text-shadow: none !important;
 }
 </style>
@@ -1117,6 +1117,10 @@ function Game() {
     for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
     const newWords = pool.slice(0,20);
     setWords(newWords);
+    // New word set = fresh game. Clear all in-progress state so the previous
+    // game's "Continue" offer doesn't bleed into this brand-new word list.
+    setResumeData(null); setShuffled([]); setIdx(0); setTries(0);
+    setResults([]); setTotalHints(0); setHints(0); setPhase("setup");
     // Explicitly save into 'random' slot regardless of activeMode state timing
     setTimeout(()=>{
       allSlotsRef.current['random'] = {words:newWords, phase:"setup", shuffled:[], wordIdx:0, results:[], tries:0};
