@@ -514,7 +514,7 @@ a[href="./"]:hover{transform:translateY(-2px) scale(1.06) !important;background:
   background-clip: unset !important;
   -webkit-text-stroke: 0 !important;
   font-weight: normal !important;
-  -webkit-text-stroke: 3px #B7005B !important;
+  -webkit-text-stroke: 3px #910048 !important;
   text-shadow: none !important;
 }
 </style>
@@ -543,7 +543,7 @@ a[href="./"]:hover{transform:translateY(-2px) scale(1.06) !important;background:
   background-clip: unset !important;
   -webkit-text-stroke: 0 !important;
   font-weight: normal !important;
-  -webkit-text-stroke: 3PX #008080 !important;
+  -webkit-text-stroke: 3PX #007777 !important;
   text-shadow: none !important;
 }
 </style>
@@ -583,7 +583,7 @@ function Game() {
   const inputRef = useRef(null);
 
   const JSONBIN_ID = "69fca31aadc21f119a68cfdb";
-  const JSONBIN_KEY = "$2a$10$ZmohFEKQaFz/Ag31Eov7I.pYkzvW4GDsS1lXI0HcUG/Qv6sqOBVA.";
+  const JSONBIN_KEY = "$2a$10$BM.eedcY14lYtTq8Hu56.eOAJOIXhH8fzztkzOxYavCHzaY5n2eGS";
   const saveTimerRef = useRef(null);
   const isSaving = useRef(false);
   const loadedRef = useRef(false);
@@ -592,38 +592,23 @@ function Game() {
 
   const jbSave = (overrides={}) => {
     if(!loadedRef.current) return;
-    // Capture state at CALL time (not when the debounced timeout fires).
-    // Otherwise rapid state changes (Random Words, mode switches) can fire
-    // jbSave with one set of state, then React updates state, then the
-    // timeout runs with the new state — saving to the wrong slot.
-    const capturedSlotKey = overrides.slotKey || activeMode || 'mywords';
-    const capturedWords   = overrides.words   || words.map(w=>w.trim());
-    const capturedPhase   = overrides.phase   !== undefined ? overrides.phase   : phase;
-    const capturedShuf    = overrides.shuffled!== undefined ? overrides.shuffled: shuffled;
-    const capturedIdx     = overrides.wordIdx !== undefined ? overrides.wordIdx : idx;
-    const capturedResults = overrides.results !== undefined ? overrides.results : results;
-    const capturedTries   = overrides.tries   !== undefined ? overrides.tries   : tries;
-
     clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(()=>{
       if(isSaving.current) return;
       isSaving.current = true;
-      const currentSlot = {
-        words: capturedWords,
-        phase: capturedPhase,
-        shuffled: capturedShuf,
-        wordIdx: capturedIdx,
-        results: capturedResults,
-        tries: capturedTries
-      };
+      const slotKey = activeMode || 'mywords';
+      const currentSlot = Object.assign({
+        words: words.map(w=>w.trim()),
+        phase, shuffled, wordIdx: idx, results, tries
+      }, overrides);
       // Always save current slot AND preserve the other slot
-      allSlotsRef.current[capturedSlotKey] = currentSlot;
-      allSlotsRef.current.activeMode = capturedSlotKey;
+      allSlotsRef.current[slotKey] = currentSlot;
+      allSlotsRef.current.activeMode = slotKey;
       // Ensure both slots exist in payload
       if(!allSlotsRef.current['mywords']) allSlotsRef.current['mywords'] = {words:[],phase:"setup",shuffled:[],wordIdx:0,results:[],tries:0};
-      if(!allSlotsRef.current['random'])  allSlotsRef.current['random']  = {words:[],phase:"setup",shuffled:[],wordIdx:0,results:[],tries:0};
+      if(!allSlotsRef.current['random']) allSlotsRef.current['random'] = {words:[],phase:"setup",shuffled:[],wordIdx:0,results:[],tries:0};
       const payload = Object.assign({}, allSlotsRef.current);
-      console.log("Saving slot:", capturedSlotKey);
+      console.log("Saving slot:", slotKey);
       fetch("https://api.jsonbin.io/v3/b/"+JSONBIN_ID,{
         method:"PUT",
         headers:{"Content-Type":"application/json","X-Master-Key":JSONBIN_KEY},
@@ -665,16 +650,12 @@ function Game() {
     if(newSlot && newSlot.words && newSlot.words.filter(w=>w).length>0){
       applySlot(newSlot);
       allSlotsRef.current.activeMode = newMode;
-      jbSave({slotKey:newMode, words:newSlot.words});
+      setTimeout(()=>jbSave({}), 300);
     } else {
       setResults([]); setShuffled([]); setIdx(0); setTries(0); setPhase("setup"); setResumeData(null);
       allSlotsRef.current.activeMode = newMode;
       if(newMode==='random') randomFill();
-      else {
-        const empty = Array(20).fill('');
-        setWords(empty);
-        jbSave({slotKey:newMode, words:empty, phase:'setup', shuffled:[], wordIdx:0, results:[], tries:0});
-      }
+      else { setWords(Array(20).fill('')); setTimeout(()=>jbSave({}), 300); }
     }
   };
 
@@ -745,13 +726,18 @@ function Game() {
     for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
     const newWords = pool.slice(0,20);
     setWords(newWords);
-    // Save through the single jbSave path with explicit slot + words so
-    // there is no race with React state propagation and no duplicate fetch.
-    jbSave({
-      slotKey:'random',
-      words:newWords,
-      phase:'setup', shuffled:[], wordIdx:0, results:[], tries:0
-    });
+    // Explicitly save into 'random' slot regardless of activeMode state timing
+    setTimeout(()=>{
+      allSlotsRef.current['random'] = {words:newWords, phase:"setup", shuffled:[], wordIdx:0, results:[], tries:0};
+      allSlotsRef.current.activeMode = 'random';
+      if(!allSlotsRef.current['mywords']) allSlotsRef.current['mywords'] = {words:[], phase:"setup", shuffled:[], wordIdx:0, results:[], tries:0};
+      const payload = Object.assign({}, allSlotsRef.current);
+      fetch("https://api.jsonbin.io/v3/b/"+JSONBIN_ID,{
+        method:"PUT",
+        headers:{"Content-Type":"application/json","X-Master-Key":JSONBIN_KEY},
+        body:JSON.stringify(payload)
+      }).catch(()=>{});
+    },200);
   }
   const refocus = () => setTimeout(()=>{ if(inputRef.current){ inputRef.current.focus(); inputRef.current.click(); } },50);
 
@@ -975,18 +961,13 @@ function Game() {
                 setActiveMode('mywords');
                 const saved = allSlotsRef.current['mywords'];
                 console.log("MY WORDS clicked, slot:", saved, "allSlots keys:", Object.keys(allSlotsRef.current));
-                let nextWords;
                 if(saved && saved.words && saved.words.filter(w=>w).length>0){
                   applySlot(saved);
-                  nextWords = saved.words;
                 } else {
-                  nextWords = Array(20).fill('');
-                  setWords(nextWords); setResults([]); setShuffled([]); setIdx(0); setTries(0); setPhase('setup'); setResumeData(null);
+                  setWords(Array(20).fill('')); setResults([]); setShuffled([]); setIdx(0); setTries(0); setPhase('setup'); setResumeData(null);
                 }
                 allSlotsRef.current.activeMode = 'mywords';
-                // Pass slotKey + words explicitly so we don't depend on
-                // React state having flushed before the save fires.
-                jbSave({slotKey:'mywords', words:nextWords.map(w=>String(w).trim())});
+                setTimeout(()=>jbSave({}),300);
               }}
               onMouseOver={e=>{if(activeMode!=='mywords'){e.currentTarget.style.background='linear-gradient(135deg,rgba(255,45,120,0.3),rgba(191,95,255,0.3)';}}}
               onMouseOut={e=>{if(activeMode!=='mywords'){e.currentTarget.style.background='linear-gradient(135deg,rgba(255,45,120,0.15),rgba(191,95,255,0.15))';}}}
@@ -1014,7 +995,7 @@ function Game() {
                 if(savedRandom && savedRandom.words && savedRandom.words.filter(w=>w).length>0){
                   applySlot(savedRandom);
                   allSlotsRef.current.activeMode = 'random';
-                  jbSave({slotKey:'random', words:savedRandom.words});
+                  setTimeout(()=>jbSave({}),300);
                 } else {
                   allSlotsRef.current.activeMode = 'random';
                   randomFill();
@@ -1075,12 +1056,11 @@ function Game() {
                   <input className="word-input" placeholder={"word "+(i+1)} value={words[i]}
                     style={highlight}
                     onChange={e=>{ const u=[...words]; u[i]=e.target.value; setWords(u);
-                      // Explicitly save to current slot when typing.
-                      // Pass slotKey + words so jbSave doesn't read stale state.
+                      // Explicitly save to mywords slot when typing
                       const slotKey = activeMode || 'mywords';
                       allSlotsRef.current[slotKey] = Object.assign(allSlotsRef.current[slotKey]||{}, {words:u.map(w=>w.trim())});
                       allSlotsRef.current.activeMode = slotKey;
-                      jbSave({slotKey:slotKey, words:u.map(w=>w.trim())});
+                      jbSave({words:u.map(w=>w.trim())});
                     }}
                     onKeyDown={e=>{
                       if(e.key==="Enter"){
