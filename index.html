@@ -504,7 +504,7 @@ a[href="./"]:hover{transform:translateY(-2px) scale(1.06) !important;background:
 <!-- end-setup_player-localfont-player -->
 <style>
 /* setup_player: font-size (player) */
-.splash-hunters, .title-ivys, .player-name, .player-title, .splash-player, #player-name, .player-label { font-size: clamp(2.5rem,10vw,5rem) !important; }
+.splash-hunters, .title-ivys, .player-name, .player-title, .splash-player, #player-name, .player-label { font-size: 4rem !important; }
 </style>
 <!-- setup_player-style-player -->
 <style>
@@ -546,7 +546,7 @@ a[href="./"]:hover{transform:translateY(-2px) scale(1.06) !important;background:
   background-clip: unset !important;
   -webkit-text-stroke: 0 !important;
   font-weight: normal !important;
-  -webkit-text-stroke: 3PX #007575 !important;
+  -webkit-text-stroke: 3PX #007171 !important;
   text-shadow: none !important;
 }
 </style>
@@ -1268,11 +1268,31 @@ function Game() {
     const s=[...valid].sort(()=>Math.random()-.5);
     setShuffled(s); setIdx(0); setTries(0); setResults([]); setTotalHints(0); setHints(0);
     setAnswer(""); setHintedPos([]); setFeedback(null); setPhase("game");
+    setResumeData(null);
+  };
+
+  const continueGame = () => {
+    // Pick up where the player left off using resumeData (populated by
+    // applySlot when a saved game has phase="game" with shuffled+wordIdx).
+    if(!resumeData || !resumeData.shuffled || resumeData.shuffled.length===0){
+      // No resume data — fall back to starting fresh
+      startGame();
+      return;
+    }
+    setShuffled(resumeData.shuffled);
+    setIdx(resumeData.wordIdx || 0);
+    setTries(resumeData.tries || 0);
+    setResults(resumeData.results || []);
+    setAnswer(""); setHintedPos([]); setHints(0); setFeedback(null);
+    setPhase("game");
   };
 
   const advance = (sArr, i) => {
     const next = i+1;
-    if(next >= sArr.length){ setPhase("results"); setFeedback(null); jbSave({phase:"results"}); }
+    if(next >= sArr.length){
+      setPhase("results"); setFeedback(null); setResumeData(null);
+      jbSave({phase:"results"});
+    }
     else {
       setIdx(next); setTries(0); setAnswer(""); setHints(0); setHintedPos([]); setFeedback(null);
       setFeedback(null); setTimeout(()=>inputRef.current?.focus(), 100);
@@ -1332,6 +1352,7 @@ function Game() {
     const s=[...shuffled].sort(()=>Math.random()-.5);
     setShuffled(s); setIdx(0); setTries(0); setResults([]); setTotalHints(0); setHints(0);
     setAnswer(""); setHintedPos([]); setFeedback(null); setPhase("game");
+    setResumeData(null);
   };
 
   const score = results.filter(r=>r.ok).length;
@@ -1499,7 +1520,27 @@ function Game() {
             </button>
           </div>
 
-          <button className="btn btn-start" onClick={startGame}><span>✨</span><span>LET'S SPELL!</span><span>✨</span></button>
+          {/* Resume in-progress game */}
+          {resumeData && resumeData.shuffled && resumeData.shuffled.length > 0 && resumeData.wordIdx < resumeData.shuffled.length && (
+            <button className="btn btn-start" style={{
+              background: "linear-gradient(135deg,#00C896,#00C4DD)",
+              boxShadow: "0 4px 28px rgba(0,200,150,.5)",
+              marginBottom: "10px"
+            }} onClick={continueGame}>
+              <span>▶</span><span>CONTINUE GAME ({resumeData.wordIdx}/{resumeData.shuffled.length})</span><span>▶</span>
+            </button>
+          )}
+
+          <button className="btn btn-start" onClick={()=>{
+            if(resumeData && resumeData.shuffled && resumeData.shuffled.length > 0 && resumeData.wordIdx < resumeData.shuffled.length){
+              if(!window.confirm("You have a game in progress. Start over from the beginning?")) return;
+            }
+            startGame();
+          }}>
+            <span>✨</span>
+            <span>{resumeData && resumeData.shuffled && resumeData.shuffled.length > 0 && resumeData.wordIdx < resumeData.shuffled.length ? "START OVER" : "LET'S SPELL!"}</span>
+            <span>✨</span>
+          </button>
 
           {results.length > 0 && (
             <>
@@ -1514,7 +1555,7 @@ function Game() {
                   if(!wrongWords.length) return;
                   const s=[...wrongWords].sort(()=>Math.random()-.5);
                   setShuffled(s); setIdx(0); setTries(0); setResults([]); setTotalHints(0); setHints(0); setSelectedGrade(null); setHintedPos([]);
-                  setAnswer(""); setFeedback(null); setPhase("game");
+                  setAnswer(""); setFeedback(null); setPhase("game"); setResumeData(null);
                 }}>
                   🔁 REDO WRONG WORDS
                 </button>
@@ -1631,7 +1672,28 @@ function Game() {
             <button className="btn btn-submit" onClick={()=>{ submit(); refocus(); }} disabled={!!feedback}><span>⚡</span><span>SUBMIT</span></button>
             <button className="btn btn-secondary" style={{color:"#AAAAFF",borderColor:"rgba(150,150,255,.3)"}} onClick={()=>{ skipWord(); refocus(); }} disabled={!!feedback}>⏭ Skip</button>
             <button className="btn btn-secondary" onClick={()=>{ useHint(); refocus(); }} disabled={!!feedback||hints>=2} style={{color:hints>=2?"rgba(255,255,255,0.3)":"#FFD700",borderColor:hints>=2?"rgba(255,255,255,0.1)":"rgba(255,215,0,0.4)",cursor:hints>=2?"not-allowed":"pointer"}}>💡 Hint{hints>0?` (${hints}/2)`:""}</button>
-            <button className="btn btn-secondary" style={{color:"#FF5555",borderColor:"rgba(255,85,85,.3)"}} onClick={()=>{ window.speechSynthesis.cancel(); setPhase("setup"); setFeedback(null); setAnswer(""); setHintedPos([]); }}>✖ Quit</button>
+            <button className="btn btn-secondary" style={{color:"#FF5555",borderColor:"rgba(255,85,85,.3)"}} onClick={()=>{
+              window.speechSynthesis.cancel();
+              // Persist the in-progress state so it can be continued later.
+              // This pushes phase="game" into the JSONBin slot AND populates
+              // resumeData so the setup screen shows the Continue button.
+              if(shuffled && shuffled.length > 0 && idx < shuffled.length) {
+                setResumeData({
+                  shuffled: shuffled,
+                  wordIdx: idx,
+                  tries: tries,
+                  results: results
+                });
+                jbSave({
+                  phase: "game",
+                  shuffled: shuffled,
+                  wordIdx: idx,
+                  tries: tries,
+                  results: results
+                });
+              }
+              setPhase("setup"); setFeedback(null); setAnswer(""); setHintedPos([]);
+            }}>✖ Quit</button>
           </div>
         </div>
       )}
@@ -1676,7 +1738,7 @@ function Game() {
               <div className="modal-body">
                 <p style={{marginBottom:16}}>
                   <strong style={{color:"#FFD700",fontSize:"1.05rem"}}>IVY'S — HOP 'N SPELL</strong><br/>
-                  <span style={{color:"rgba(255,255,255,.6)",fontSize:".85rem"}}>Andrew Blyskosz &nbsp;·&nbsp; © 2026 &nbsp;·&nbsp; Version 2 &nbsp;·&nbsp; Bin: {JSONBIN_ID}</span>
+                  <span style={{color:"rgba(255,255,255,.6)",fontSize:".85rem"}}>Andrew Blyskosz &nbsp;·&nbsp; © 2026 &nbsp;·&nbsp; Version 10 &nbsp;·&nbsp; Bin: {JSONBIN_ID}</span>
                 </p>
                 <p style={{marginBottom:8,color:"rgba(255,255,255,.5)",fontSize:".8rem",letterSpacing:"1px",textTransform:"uppercase",fontWeight:800}}>Support the developer</p>
                 <div style={{display:"flex",flexDirection:"column",gap:"8px"}}>
